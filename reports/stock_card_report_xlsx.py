@@ -96,6 +96,16 @@ class ReportStockCardReportXlsx(models.AbstractModel):
                 "data": {"value": self._render("balance")},
                 "width": 25,
             },
+            "6_unit_price": {
+                "header": {"value": "unit_price"},
+                "data": {"value": self._render("unit_price")},
+                "width": 25,
+            },
+            "7_gold": {
+                "header": {"value": "gold"},
+                "data": {"value": self._render("gold")},
+                "width": 25,
+            },
         }
 
         ws_params = {
@@ -161,7 +171,12 @@ class ReportStockCardReportXlsx(models.AbstractModel):
             row_pos,
             ws_params,
             col_specs_section="data",
-            render_space={"balance": balance},
+            render_space={
+                "balance": balance,
+                "unit_price": objects.product_id.standard_price or "",
+                "gold": (objects.product_id.standard_price)*balance or "",
+                
+                },
             col_specs="col_specs_initial",
             wanted_list="wanted_list_initial",
         )
@@ -181,6 +196,8 @@ class ReportStockCardReportXlsx(models.AbstractModel):
                     "input": line.product_in or 0,
                     "output": line.product_out or 0,
                     "balance": balance,
+                    "unit_price": line.product_id.standard_price or "",
+                    "gold": (line.product_id.standard_price)*balance or "",
                 },
                 default_format=FORMATS["format_tcell_amount_right"],
             )
